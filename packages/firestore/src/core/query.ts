@@ -856,7 +856,9 @@ export class NotInFilter extends FieldFilter {
 
   matches(doc: Document): boolean {
     const other = doc.field(this.field);
-    return other !== null && !arrayValueContains(this.value.arrayValue!, other);
+    const matched =
+      other !== null && !arrayValueContains(this.value.arrayValue!, other);
+    return matched;
   }
 }
 

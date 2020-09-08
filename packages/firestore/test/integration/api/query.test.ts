@@ -32,6 +32,7 @@ import {
   withTestCollection,
   withTestDb
 } from '../util/helpers';
+import { setLogLevel } from '../../../src/util/log';
 
 const Blob = firebaseExport.Blob;
 const FieldPath = firebaseExport.FieldPath;
@@ -919,6 +920,27 @@ apiDescribe('Queries', (persistence: boolean) => {
         // @ts-expect-error
         delete expected.j;
         expect(toDataArray(snapshot5)).to.deep.equal(Object.values(expected));
+      });
+    }
+  );
+
+  (isRunningAgainstEmulator() ? it.only : it.skip)(
+    'can use NOT_IN filters',
+    async () => {
+      const testDocs = {
+        a: { zip: 98101 },
+        i: { zip: null }
+      };
+
+      await withTestCollection(persistence, testDocs, async coll => {
+        setLogLevel('debug');
+        await coll.where('zip', notInOp, [98101]).get();
+
+        console.log('lol');
+
+        // With null.
+        const snapshot3 = await coll.where('zip', notInOp, [null]).get();
+        expect(toDataArray(snapshot3)).to.deep.equal([]);
       });
     }
   );
